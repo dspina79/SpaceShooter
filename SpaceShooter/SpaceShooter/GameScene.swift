@@ -17,6 +17,9 @@ enum CollisionType: UInt32 {
 class GameScene: SKScene {
     let player = SKSpriteNode(imageNamed: "player")
     
+    let waves = Bundle.main.decode([Wave].self, from: "waves.json")
+    let enemtyTypes = Bundle.main.decode([EnemyType].self, from: "enemy-types.json")
+    
     override func didMove(to view: SKView) {
         if let particles = SKEmitterNode(fileNamed: "Starfield") {
             particles.position = CGPoint(x: 1080, y: 0)
