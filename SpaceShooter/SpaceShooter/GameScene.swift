@@ -18,7 +18,13 @@ class GameScene: SKScene {
     let player = SKSpriteNode(imageNamed: "player")
     
     let waves = Bundle.main.decode([Wave].self, from: "waves.json")
-    let enemtyTypes = Bundle.main.decode([EnemyType].self, from: "enemy-types.json")
+    let enemyTypes = Bundle.main.decode([EnemyType].self, from: "enemy-types.json")
+ 
+    var isPlayerAlive = true
+    var waveNumber = 0
+    var levelNumber = 0
+    
+    let positions = Array(stride(from: -320, through: 320, by: 80))
     
     override func didMove(to view: SKView) {
         if let particles = SKEmitterNode(fileNamed: "Starfield") {
@@ -41,5 +47,34 @@ class GameScene: SKScene {
         
     }
     
+    func createWave() {
+        guard isPlayerAlive else { return }
+        
+        if waveNumber == waves.count {
+            levelNumber += 1
+            waveNumber = 0
+        }
+        
+        let wave = waves[waveNumber]
+        waveNumber += 1
+        
+        let minimumEnemtyType = min(enemyTypes.count, levelNumber + 1)
+        let enemyType = Int.random(in: 0..<minimumEnemtyType)
+        let enemyOffset: CGFloat = 100
+        let enemyStartX = 600
+        
+        if wave.enemies.isEmpty {
+            //random wave
+            for (index, position) in positions.shuffled().enumerated() {
+                let enemy = EnemyNode(enemyTypes[enemyType], startPosition: CGPoint(x: enemyStartX, y: position), xOffset: enemyOffset * CGFloat(index * 3), movingStraight: true)
+                addChild(enemy)
+            }
+        } else {
+            for enemy in wave.enemies {
+                let node = EnemyNode(enemyTypes[enemyType], startPosition: CGPoint(x: enemyStartX, y: positions[enemy.position]), xOffset: enemyOffset * enemy.xOffset, movingStraight: enemy.moveStraight)
+                addChild(node)
+            }
+        }
+    }
     
 }
