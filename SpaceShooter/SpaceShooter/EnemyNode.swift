@@ -20,9 +20,8 @@ class EnemyNode: SKSpriteNode {
         super.init(texture: texture, color: .white, size: texture.size())
         self.physicsBody = SKPhysicsBody(texture: texture, size: texture.size())
         self.physicsBody?.categoryBitMask = CollisionType.enemy.rawValue
-        self.physicsBody?.collisionBitMask = CollisionType.player.rawValue | CollisionType.playerWewapon.rawValue
-        self.physicsBody?.contactTestBitMask = CollisionType.player.rawValue | CollisionType.playerWewapon.rawValue
-        self.physicsBody?.isDynamic = false
+        self.physicsBody?.collisionBitMask = CollisionType.player.rawValue | CollisionType.playerWeapon.rawValue
+        self.physicsBody?.contactTestBitMask = CollisionType.player.rawValue | CollisionType.playerWeapon.rawValue
         
         self.name = "Enemy"
         self.position = CGPoint(x: startPosition.x + xOffset, y: startPosition.y)
@@ -45,5 +44,27 @@ class EnemyNode: SKSpriteNode {
         let movement = SKAction.follow(path.cgPath, asOffset: true, orientToPath: true, speed: self.type.speed)
         let sequence = SKAction.sequence([movement, .removeFromParent()])
         run(sequence)
+    }
+    
+    func fire() {
+        let weaponType = "\(type.name)Weapon"
+        let weapon = SKSpriteNode(imageNamed: weaponType)
+        weapon.name = "enemyWeapon"
+        weapon.position = position
+        weapon.zRotation = zRotation
+        
+        parent?.addChild(weapon)
+        // add the child before adding the push
+        weapon.physicsBody = SKPhysicsBody(rectangleOf: weapon.size)
+        weapon.physicsBody?.categoryBitMask = CollisionType.enemyWeapon.rawValue
+        weapon.physicsBody?.collisionBitMask = CollisionType.player.rawValue
+        weapon.physicsBody?.mass = 0.001
+        
+        let speed: CGFloat = 1
+        let adjustedRoation = zRotation + (CGFloat.pi / 2)
+        let deltaX = speed * cos(adjustedRoation)
+        let deltaY = speed * sin(adjustedRoation)
+        
+        weapon.physicsBody?.applyImpulse(CGVector(dx: deltaX, dy: deltaY))
     }
 }
