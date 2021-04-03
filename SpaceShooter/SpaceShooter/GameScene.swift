@@ -14,7 +14,7 @@ enum CollisionType: UInt32 {
     case enemyWeapon = 8
 }
 
-class GameScene: SKScene {
+class GameScene: SKScene, SKPhysicsContactDelegate {
     let player = SKSpriteNode(imageNamed: "player")
     
     let waves = Bundle.main.decode([Wave].self, from: "waves.json")
@@ -23,11 +23,13 @@ class GameScene: SKScene {
     var isPlayerAlive = true
     var waveNumber = 0
     var levelNumber = 0
+    var playerShields = 10
     
     let positions = Array(stride(from: -320, through: 320, by: 80))
     
     override func didMove(to view: SKView) {
         physicsWorld.gravity = .zero
+        physicsWorld.contactDelegate = self
         if let particles = SKEmitterNode(fileNamed: "Starfield") {
             particles.position = CGPoint(x: 1080, y: 0)
             particles.advanceSimulationTime(60)
@@ -105,6 +107,91 @@ class GameScene: SKScene {
                 addChild(node)
             }
         }
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard isPlayerAlive else { return }
+        
+        let shot = SKSpriteNode(imageNamed: "playerWeapon")
+        shot.position = player.position
+        shot.name = "playerWeapon"
+        shot.physicsBody = SKPhysicsBody(rectangleOf: shot.size)
+        shot.physicsBody?.categoryBitMask = CollisionType.playerWeapon.rawValue
+        shot.physicsBody?.collisionBitMask = CollisionType.enemy.rawValue | CollisionType.enemyWeapon.rawValue
+        shot.physicsBody?.contactTestBitMask = CollisionType.enemy.rawValue | CollisionType.enemyWeapon.rawValue
+        
+        addChild(shot)
+        
+        let movement = SKAction.move(to: CGPoint(x: 1900, y: shot.position.y), duration: 5)
+        let sequence = SKAction.sequence([movement, .removeFromParent()])
+        shot.run(sequence)
+    }
+    
+    func didBegin(_ contact: SKPhysicsContact) {
+        guard let nodeA = contact.bodyA.node else { return }
+        guard let nodeB = contact.bodyB.node else { return }
+        
+        let sortedNodes = [nodeA, nodeB].sorted{
+            $0.name ?? "" < $1.name ?? ""
+        } // this will be sorted into enemy, enemyWeapon, player, playerWeapon
+        
+        let firstNode = sortedNodes[0]
+        let secondNode = sortedNodes[1]
+        
+        if secondNode.name == "player" {
+            guard isPlayerAlive else { return }
+            if let explosion = SKEmitterNode(fileNamed: "Explosion") {
+                explosion.position = firstNode.position
+                addChild(explosion)
+            }
+            
+            playerShields -= 1
+            if playerShields == 0 {
+                gameOver()
+                secondNode.removeFromParent()
+            }
+            
+            firstNode.removeFromParent()
+        } else if let enemy = firstNode as? EnemyNode {
+            enemy.shields -= 1
+            if enemy.shields == 0 {
+                if let explosion = SKEmitterNode(fileNamed: "Explosion") {
+                    explosion.position = enemy.position
+                    addChild(explosion)
+                }
+                firstNode.removeFromParent()
+            }
+            
+            if let explosion = SKEmitterNode(fileNamed: "Explosion") {
+                explosion.position = enemy.position
+                addChild(explosion)
+            }
+            
+            secondNode.removeFromParent()
+        } else {
+            if let explosion = SKEmitterNode(fileNamed: "Explosion") {
+                explosion.position = secondNode.position
+                addChild(explosion)
+            }
+            
+            firstNode.removeFromParent()
+            secondNode.removeFromParent()
+        }
+        
+        
+    }
+    
+    func gameOver() {
+        isPlayerAlive = false
+        
+        if let explosion = SKEmitterNode(fileNamed: "Explosion") {
+            explosion.position = player.position
+            addChild(explosion)
+        }
+        
+        let gameOver = SKSpriteNode(imageNamed: "gameOver")
+        
+        addChild(gameOver) // centered by default
     }
     
 }

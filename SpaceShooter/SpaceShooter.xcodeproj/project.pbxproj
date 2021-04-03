@@ -20,6 +20,7 @@
 		557D7FAB26115A90004DEB2E /* Wave.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557D7FAA26115A90004DEB2E /* Wave.swift */; };
 		557D7FAE26115B49004DEB2E /* Bundle-Decoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557D7FAD26115B49004DEB2E /* Bundle-Decoding.swift */; };
 		557D7FB126115DC3004DEB2E /* EnemyNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557D7FB026115DC3004DEB2E /* EnemyNode.swift */; };
+		557D7FB42617E786004DEB2E /* Explosion.sks in Resources */ = {isa = PBXBuildFile; fileRef = 557D7FB32617E786004DEB2E /* Explosion.sks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,7 @@
 		557D7FAA26115A90004DEB2E /* Wave.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Wave.swift; sourceTree = "<group>"; };
 		557D7FAD26115B49004DEB2E /* Bundle-Decoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle-Decoding.swift"; sourceTree = "<group>"; };
 		557D7FB026115DC3004DEB2E /* EnemyNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnemyNode.swift; sourceTree = "<group>"; };
+		557D7FB32617E786004DEB2E /* Explosion.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Explosion.sks; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +75,7 @@
 				557D7F88260EB840004DEB2E /* AppDelegate.swift */,
 				557D7F8A260EB840004DEB2E /* GameScene.sks */,
 				557D7F8E260EB840004DEB2E /* GameScene.swift */,
+				557D7FB32617E786004DEB2E /* Explosion.sks */,
 				557D7FB026115DC3004DEB2E /* EnemyNode.swift */,
 				557D7F90260EB840004DEB2E /* GameViewController.swift */,
 				557D7F92260EB841004DEB2E /* Main.storyboard */,
@@ -150,6 +153,7 @@
 				557D7F8B260EB840004DEB2E /* GameScene.sks in Resources */,
 				557D7FA0260EB9BC004DEB2E /* Starfield.sks in Resources */,
 				557D7FA42610147D004DEB2E /* waves.json in Resources */,
+				557D7FB42617E786004DEB2E /* Explosion.sks in Resources */,
 				557D7F96260EB845004DEB2E /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
