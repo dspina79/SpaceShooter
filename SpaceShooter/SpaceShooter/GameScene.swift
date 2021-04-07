@@ -194,7 +194,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     explosion.position = enemy.position
                     addChild(explosion)
                 }
-                score += (10 ^ enemy.type.shields)
+                score += ((10 ^ enemy.type.shields) * 100)
                 updateScore()
                 firstNode.removeFromParent()
                 
