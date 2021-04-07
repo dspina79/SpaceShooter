@@ -5,6 +5,7 @@
 //  Created by Dave Spina on 3/26/21.
 //
 
+import CoreMotion
 import SpriteKit
 
 enum CollisionType: UInt32 {
@@ -15,6 +16,8 @@ enum CollisionType: UInt32 {
 }
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
+    var score: Int = 0
+    let motionManager = CMMotionManager()
     let player = SKSpriteNode(imageNamed: "player")
     
     let waves = Bundle.main.decode([Wave].self, from: "waves.json")
@@ -36,6 +39,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             particles.zPosition = -1;
             addChild(particles)
         }
+   
+        let scoreNode = SKLabelNode(text: "Score: \(self.score)")
+        scoreNode.name = "score"
+        scoreNode.zPosition = 100
+        scoreNode.position = CGPoint(x: frame.maxX - 500, y: frame.minY + 20)
+        scoreNode.fontColor = .white
+        scoreNode.fontSize = CGFloat(20)
+        addChild(scoreNode)
         
         player.name = "Player";
         player.position.x = frame.minX + 75;
@@ -48,9 +59,22 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         player.physicsBody?.contactTestBitMask = CollisionType.enemy.rawValue | CollisionType.enemyWeapon.rawValue
         player.physicsBody?.isDynamic = false
         
+        motionManager.startAccelerometerUpdates()
+        
     }
     
     override func update(_ currentTime: TimeInterval) {
+        
+        if let accelerometerData = motionManager.accelerometerData {
+            player.position.y = CGFloat(accelerometerData.acceleration.x * 50)
+        }
+        
+        if player.position.y < frame.minY {
+            player.position.y = frame.minY
+        } else if player.position.y > frame.maxY {
+            player.position.y = frame.maxY
+        }
+        
         for child in children{
             if child.frame.maxX < 0 {
                 if !frame.intersects(child.frame) {
@@ -77,6 +101,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 }
             }
         }
+    }
+    
+    override func sceneDidLoad() {
+        
     }
     
     func createWave() {
@@ -127,6 +155,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         shot.run(sequence)
     }
     
+    func updateScore() {
+        if let scoreNode = self.childNode(withName: "score") as? SKLabelNode {
+            scoreNode.text = "Score: \(self.score)"
+        }
+    }
+    
+    
     func didBegin(_ contact: SKPhysicsContact) {
         guard let nodeA = contact.bodyA.node else { return }
         guard let nodeB = contact.bodyB.node else { return }
@@ -159,7 +194,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     explosion.position = enemy.position
                     addChild(explosion)
                 }
+                score += (10 ^ enemy.type.shields)
+                updateScore()
                 firstNode.removeFromParent()
+                
             }
             
             if let explosion = SKEmitterNode(fileNamed: "Explosion") {
